@@ -5,7 +5,7 @@ interface AudioProps {
 
 const Audio: React.FC<AudioProps> = ({track, audioRef}) => {
     return (
-        <audio src={track} controls id='audio' ref={audioRef} />
+        <audio src={track} id='audio' ref={audioRef} />
     )
 }
 export default Audio

@@ -27,9 +27,11 @@ const Player = () => {
 
         // Function for time line/ progrees
         const handleTimeUpdate = () => {
-            audioRef.current?.currentTime && setCurrentTime(audioRef.current.currentTime)
+            audioRef.current?.currentTime && (setCurrentTime(audioRef.current.currentTime), setDuration(audioRef.current?.duration))
         }
         audioRef.current?.addEventListener('timeupdate', handleTimeUpdate)
+
+        
 
         return () => {
             audioRef.current?.removeEventListener('timeupdate', handleTimeUpdate)
@@ -40,15 +42,21 @@ const Player = () => {
         target: {value: string}
 
     }
+
+    // Calculate new time
+    const [newTime, setNewTime] = useState(0)
+
     const handleProgressLine = (event: ProgressLineEvent) => {
+        
+        console.log('input time ', Number(event.target.value))
+        console.log('audio time ', audioRef.current?.currentTime)
+        
+        audioRef.current && (
+            setCurrentTime(Number(event.target.value)),
+            audioRef.current.currentTime = Number(event.target.value),
+            setDuration(audioRef.current?.duration)
+        )
 
-        // Get value of line
-        const value = event.target.value
-        // Calculate new time
-        const newTime = (Number(value) / 100) * duration
-
-        // Set new time into audioRef
-        audioRef.current?.currentTime = newTime
     }
 
     const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -63,7 +71,7 @@ const Player = () => {
     }
 
     const track = {path: currentTrack?.path}
-    console.log(currentTime)
+    // console.log(typeof(String(audioRef.current?.duration)))
     return (
         <div className={styles.Player}>
             <div className={styles['album-art']}>
@@ -71,7 +79,11 @@ const Player = () => {
             </div>
             <Audio  track={currentTrack?.path} audioRef={audioRef}/>
             <div className={styles.songLine}>
-                <input min='0' value='0' id={styles.Progress} type="range"/>
+                <div className={styles.Time}>
+                    <span className={styles.TimeStart}>{'0'}</span>
+                    <span className={styles.TimeStop}>{`${2}:${55}`}</span>
+                </div>
+                <input name='my input' min='0' max={duration} value={String(currentTime)} onChange={(event) => handleProgressLine(event)} id={styles.Progress} type="range"/>
             </div>
             <nav className={styles['player-nav']}>
                 <PreviousButon />
