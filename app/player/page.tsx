@@ -5,9 +5,9 @@ import PreviousButon from '@/components/buttons/PreviousButton'
 import NextButon from '@/components/buttons/NextButton'
 import PlayLIst from '../Play-list'
 import Audio from '@/components/audio/Audio'
+import Title from '@/components/title/Title'
 import { useRef, useEffect, useState } from 'react'
 import React from 'react'
-import { start } from 'repl'
 
 const Player = () => {
 
@@ -23,25 +23,27 @@ const Player = () => {
         [duration, setDuration] = useState(0),
         [fullTime, setFullTime] = useState({min: '', seconds: ''}),
         audioRef = useRef<HTMLAudioElement | null>(null),
-        [currentSeconds, setCurrentSeconds] = useState(0);
+        [sec,setSec] = useState({min: '0', seconds: '00'});
         
     useEffect(() => {
         const randomTrack = Math.floor(Math.random() * PlayLIst().length)
         const playTrack = PlayLIst()[randomTrack]
         setCurrentTrack(playTrack)
-
+        console.log(currentTrack)
         // Function for time line/ progrees
         const handleTimeUpdate = () => {
-            audioRef.current?.currentTime && (setCurrentTime(audioRef.current.currentTime), setDuration(audioRef.current?.duration))
+            audioRef.current?.currentTime && (setCurrentTime(audioRef.current.currentTime), setDuration(audioRef.current?.duration), currentSeconds(audioRef.current.currentTime))
         }
         audioRef.current?.addEventListener('timeupdate', handleTimeUpdate)
 
         audioRef.current?.addEventListener('loadedmetadata', (event: Event) => {
             const audioEvent = event.target as HTMLAudioElement
-            // console.log(audioEvent.duration)
-            getFullTimeSong(audioEvent.duration)
-        })
 
+            setDuration(audioEvent.duration)
+            getFullTimeSong(audioEvent.duration)
+            setCurrentTime(audioEvent.currentTime)
+        })
+        
         return () => {
             audioRef.current?.removeEventListener('timeupdate', handleTimeUpdate)
         }
@@ -59,18 +61,15 @@ const Player = () => {
         // console.log('minutes: ', minutes, 'seconds: ', seconds)
     }
 
-    const getCurrentSeconds = () => {
+    // Current seconds
+    const currentSeconds = (time: number) => {
+        let minutes = ''
+        let seconds = ''
 
-        const startTime = setTimeout(() => {
-            let seconds
-            audioRef.current?.paused === false 
-                ? (seconds = currentSeconds + 1,
-                setCurrentSeconds(seconds), 
-                console.log(currentSeconds))
-                : false
-        }, 1000)
+        minutes = String(Math.floor((time / 60) % 60) < 1 ? `${Math.floor((time / 60) % 60)}` : Math.floor((time / 60) % 60))
+        seconds = String(Math.floor(time % 60) < 10 ? `0${Math.floor(time % 60)}` : Math.floor(time % 60))
+        setSec({min: minutes, seconds: seconds})
     }
-    getCurrentSeconds()
     
     interface ProgressLineEvent {
         target: {value: string}
@@ -79,23 +78,26 @@ const Player = () => {
     // Calculate new time
     const handleProgressLine = (event: ProgressLineEvent) => {
         
-        console.log('input time ', Number(event.target.value))
-        console.log('audio time ', audioRef.current?.duration)
+        // console.log('input time ', Number(event.target.value))
+        // console.log('audio time ', audioRef.current?.duration)
         
         audioRef.current && (
             setCurrentTime(Number(event.target.value)),
             audioRef.current.currentTime = Number(event.target.value),
             setDuration(audioRef.current?.duration)
         )
-
     }
-    
+
+    const progressLineCurrentColor = () => {
+        return currentTime && (currentTime / duration) * 100
+    }
+
     // Start play or pause, and change the icons
     const playSong = () => {
         audioRef.current && audioRef.current.paused 
             ? (audioRef.current.play(), setPlayPauseIcons(false)) 
             : audioRef.current 
-            ? (audioRef.current.pause(), setPlayPauseIcons(true), getCurrentSeconds()) 
+            ? (audioRef.current.pause(), setPlayPauseIcons(true)) 
             : null
     }
 
@@ -106,13 +108,14 @@ const Player = () => {
             <div className={styles['album-art']}>
                 <img src={currentTrack?.art} alt="" />
             </div>
+            <Title artist={currentTrack?.artist} name={currentTrack?.song}/>
             <Audio  track={currentTrack?.path} audioRef={audioRef}/>
             <div className={styles.songLine}>
                 <div className={styles.Time}>
-                    <span className={styles.TimeStart}>{`0:0${currentSeconds}`}</span>
+                    <span className={styles.TimeStart}>{`${sec.min}:${sec.seconds}`}</span>
                     <span className={styles.TimeStop}>{`${fullTime.min}:${fullTime.seconds}`}</span>
                 </div>
-                <input name='my input' min='0' max={duration} value={String(currentTime)} onChange={(event) => handleProgressLine(event)} id={styles.Progress} type="range"/>
+                <input style={{background: `linear-gradient(to right, #a7a7a7 ${progressLineCurrentColor()}%, #e6e6e6 ${progressLineCurrentColor()}%)`}} name='my input' min={0} value={String(currentTime)} max={duration} onChange={(event) => {handleProgressLine(event), console.log(event)}} id={styles.Progress} type="range"/>
             </div>
             <nav className={styles['player-nav']}>
                 <PreviousButon />
