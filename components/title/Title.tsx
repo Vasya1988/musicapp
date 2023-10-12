@@ -1,7 +1,7 @@
 import styles from './Title.module.sass'
 import React from 'react'
 
-interface TitleProps { artist: String, name: String }
+interface TitleProps { artist: String | undefined, name: String | undefined}
 
 const Title: React.FC<TitleProps> = ({ artist, name }) => {
 

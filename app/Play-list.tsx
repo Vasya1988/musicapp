@@ -1,4 +1,4 @@
-const PlayLIst = () => {
+
     interface Song {
         artist: string,
         song: string,
@@ -6,7 +6,7 @@ const PlayLIst = () => {
         art: string
     }
     
-    const List: Song[] = [
+    export const List: Song[] = [
         {
             artist: 'Blacktop Mojo', 
             song: 'Tail Lights', 
@@ -26,8 +26,7 @@ const PlayLIst = () => {
             art: 'art/Blacktop Mojo Prodigal.jpg'
         }
     ]
-    return List
-}
-export default PlayLIst
+
+
 
 

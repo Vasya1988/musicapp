@@ -3,17 +3,18 @@ import styles from './Player.module.sass'
 import PlayButton from '../../components/buttons/PlayButton'
 import PreviousButon from '@/components/buttons/PreviousButton'
 import NextButon from '@/components/buttons/NextButton'
-import PlayLIst from '../Play-list'
+import {List} from '../Play-list'
 import Audio from '@/components/audio/Audio'
 import Title from '@/components/title/Title'
 import { useRef, useEffect, useState } from 'react'
-import React from 'react'
 
 const Player = () => {
 
     interface Track {
         path: string,
-        art: string
+        art: string,
+        artist: string,
+        song: string
     }
 
     const 
@@ -21,15 +22,16 @@ const Player = () => {
         [playPauseIcons, setPlayPauseIcons] = useState(true),
         [currentTime, setCurrentTime] = useState<number | null>(null),
         [duration, setDuration] = useState(0),
-        [fullTime, setFullTime] = useState({min: '', seconds: ''}),
+        [fullTime, setFullTime] = useState({min: '0', seconds: '00'}),
         audioRef = useRef<HTMLAudioElement | null>(null),
-        [sec,setSec] = useState({min: '0', seconds: '00'});
+        [startTime, setStartTime] = useState({min: '0', seconds: '00'});
+        const [randomTrack, setRandomTrack] = useState(Math.floor(Math.random() * List.length))
         
     useEffect(() => {
-        const randomTrack = Math.floor(Math.random() * PlayLIst().length)
-        const playTrack = PlayLIst()[randomTrack]
+        const playTrack = List[randomTrack]
+
         setCurrentTrack(playTrack)
-        console.log(currentTrack)
+
         // Function for time line/ progrees
         const handleTimeUpdate = () => {
             audioRef.current?.currentTime && (setCurrentTime(audioRef.current.currentTime), setDuration(audioRef.current?.duration), currentSeconds(audioRef.current.currentTime))
@@ -49,7 +51,7 @@ const Player = () => {
         }
     }, [])
 
-    // Find out minutes and seconds of song
+    // Get minutes and seconds of song
     const getFullTimeSong = (time: number) => {
 
         let minutes: string, seconds: string;
@@ -57,8 +59,6 @@ const Player = () => {
         minutes = String(Math.floor((time / 60) % 60))
         seconds = String(Math.floor(time % 60) < 10 ? `0${Math.floor(time % 60)}` : Math.floor(time % 60))
         setFullTime({min: minutes, seconds: seconds})
-
-        // console.log('minutes: ', minutes, 'seconds: ', seconds)
     }
 
     // Current seconds
@@ -68,7 +68,7 @@ const Player = () => {
 
         minutes = String(Math.floor((time / 60) % 60) < 1 ? `${Math.floor((time / 60) % 60)}` : Math.floor((time / 60) % 60))
         seconds = String(Math.floor(time % 60) < 10 ? `0${Math.floor(time % 60)}` : Math.floor(time % 60))
-        setSec({min: minutes, seconds: seconds})
+        setStartTime({min: minutes, seconds: seconds})
     }
     
     interface ProgressLineEvent {
@@ -77,10 +77,7 @@ const Player = () => {
     }
     // Calculate new time
     const handleProgressLine = (event: ProgressLineEvent) => {
-        
-        // console.log('input time ', Number(event.target.value))
-        // console.log('audio time ', audioRef.current?.duration)
-        
+
         audioRef.current && (
             setCurrentTime(Number(event.target.value)),
             audioRef.current.currentTime = Number(event.target.value),
@@ -88,6 +85,7 @@ const Player = () => {
         )
     }
 
+    // Change color of progrees line
     const progressLineCurrentColor = () => {
         return currentTime && (currentTime / duration) * 100
     }
@@ -101,8 +99,37 @@ const Player = () => {
             : null
     }
 
-    const track = {path: currentTrack?.path}
-    // console.log(typeof(String(audioRef.current?.duration)))
+    // Previous track
+    interface PlayPrevProps  { ( direction: string): void }
+    
+    const playPreviousTrack:PlayPrevProps = (direction) => {
+        setPlayPauseIcons(true)
+        setStartTime(({min: '0', seconds: '00'}))
+        direction === 'previous' 
+            ? (
+                setRandomTrack(() => {
+                    let newRandomTrack = randomTrack - 1
+                    newRandomTrack < 0
+                        ? (
+                            setCurrentTrack(List[List.length - 1]), 
+                            newRandomTrack = List.length - 1
+                            )
+                        : (setCurrentTrack(List[newRandomTrack]))
+                    return newRandomTrack
+                })
+            )
+            : setRandomTrack(() => {
+                let newRandomTrack = randomTrack + 1
+                newRandomTrack >= List.length
+                    ? (
+                        setCurrentTrack(List[0]), 
+                        newRandomTrack = 0
+                        )
+                    : (setCurrentTrack(List[newRandomTrack]))
+                return newRandomTrack
+            })
+    }
+
     return (
         <div className={styles.Player}>
             <div className={styles['album-art']}>
@@ -112,15 +139,15 @@ const Player = () => {
             <Audio  track={currentTrack?.path} audioRef={audioRef}/>
             <div className={styles.songLine}>
                 <div className={styles.Time}>
-                    <span className={styles.TimeStart}>{`${sec.min}:${sec.seconds}`}</span>
+                    <span className={styles.TimeStart}>{`${startTime.min}:${startTime.seconds}`}</span>
                     <span className={styles.TimeStop}>{`${fullTime.min}:${fullTime.seconds}`}</span>
                 </div>
-                <input style={{background: `linear-gradient(to right, #a7a7a7 ${progressLineCurrentColor()}%, #e6e6e6 ${progressLineCurrentColor()}%)`}} name='my input' min={0} value={String(currentTime)} max={duration} onChange={(event) => {handleProgressLine(event), console.log(event)}} id={styles.Progress} type="range"/>
+                <input style={{background: `linear-gradient(to right, #a7a7a7 ${progressLineCurrentColor()}%, #e6e6e6 ${progressLineCurrentColor()}%)`}} name='my input' min={0} value={String(currentTime)} max={duration} onChange={(event) => {handleProgressLine(event)}} id={styles.Progress} type="range"/>
             </div>
             <nav className={styles['player-nav']}>
-                <PreviousButon />
+                <PreviousButon func={(event) => {playPreviousTrack(event.currentTarget.dataset.direction)}} />
                 <PlayButton func={()=>playSong()} play={playPauseIcons}/>
-                <NextButon />
+                <NextButon func={(event) => {playPreviousTrack(event.currentTarget.dataset.direction)}} />
             </nav>
             
         </div>
