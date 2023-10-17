@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import styles from './Buttons.module.sass'
 
-interface PreviousButtonProps {func: (event: object) => void}
+interface PreviousButtonProps {func: (event: MouseEvent) => void}
 const PreviousButon: React.FC<PreviousButtonProps> = ({func}) => {
     return (
         <button onClick={func} data-direction='previous' className={styles.Previous}>

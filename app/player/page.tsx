@@ -7,6 +7,7 @@ import {List} from '../Play-list'
 import Audio from '@/components/audio/Audio'
 import Title from '@/components/title/Title'
 import { useRef, useEffect, useState } from 'react'
+import React, {MouseEvent} from 'react'
 
 const Player = () => {
 
@@ -145,9 +146,17 @@ const Player = () => {
                 <input style={{background: `linear-gradient(to right, #a7a7a7 ${progressLineCurrentColor()}%, #e6e6e6 ${progressLineCurrentColor()}%)`}} name='my input' min={0} value={String(currentTime)} max={duration} onChange={(event) => {handleProgressLine(event)}} id={styles.Progress} type="range"/>
             </div>
             <nav className={styles['player-nav']}>
-                <PreviousButon func={(event) => {playPreviousTrack(event.currentTarget.dataset.direction)}} />
+                <PreviousButon func={(event: MouseEvent) => {
+
+                    const direction = (event.currentTarget as HTMLButtonElement).dataset.direction
+                    direction && playPreviousTrack(direction)}} />
+
                 <PlayButton func={()=>playSong()} play={playPauseIcons}/>
-                <NextButon func={(event) => {playPreviousTrack(event.currentTarget.dataset.direction)}} />
+
+                <NextButon func={(event: MouseEvent) => {
+                    
+                    const direction = (event.currentTarget as HTMLButtonElement).dataset.direction
+                    direction && playPreviousTrack(direction)}} />
             </nav>
             
         </div>
