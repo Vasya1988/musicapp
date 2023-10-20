@@ -1,5 +1,5 @@
 1:HL["/musicapp/_next/static/css/e2a8f26c4838ecb4.css",{"as":"style"}]
-0:["RH5IEDcglXppBm3SqBOqd",[[["",{"children":["player",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],"$L2",[[["$","link","0",{"rel":"stylesheet","href":"/musicapp/_next/static/css/e2a8f26c4838ecb4.css","precedence":"next"}]],"$L3"]]]]
+0:["FJIoHq8MwBUe_eRKlm4hR",[[["",{"children":["player",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],"$L2",[[["$","link","0",{"rel":"stylesheet","href":"/musicapp/_next/static/css/e2a8f26c4838ecb4.css","precedence":"next"}]],"$L3"]]]]
 4:HL["/musicapp/_next/static/css/f4c1cb7d46c0b3ef.css",{"as":"style"}]
 5:I{"id":7767,"chunks":["272:static/chunks/webpack-f156da9d48d98d79.js","971:static/chunks/fd9d1056-9593a577cdf5fc4e.js","596:static/chunks/596-40fc2160769332b0.js"],"name":"default","async":false}
 6:I{"id":7920,"chunks":["272:static/chunks/webpack-f156da9d48d98d79.js","971:static/chunks/fd9d1056-9593a577cdf5fc4e.js","596:static/chunks/596-40fc2160769332b0.js"],"name":"default","async":false}
