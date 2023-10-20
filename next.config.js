@@ -4,8 +4,8 @@ const nextConfig = {
     output: "export", 
     
     // Что бы указать корретный путь к css файлам на github
-    // assetPrefix: `/musicapp`, 
-    // basePath: '/musicapp'
+    assetPrefix: `/musicapp`, 
+    basePath: '/musicapp'
 }
 
 module.exports = nextConfig
